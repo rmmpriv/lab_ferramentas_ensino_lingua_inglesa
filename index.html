@@ -76,7 +76,65 @@ button {
     </div>
 
     <script>
-        // A inteligência (JavaScript) entrará aqui depois!
+       const vocabPairs = [
+    { en: "Apple", pt: "Maçã" }, { en: "Book", pt: "Livro" },
+    { en: "Dog", pt: "Cachorro" }, { en: "Water", pt: "Água" },
+    { en: "House", pt: "Casa" }, { en: "Car", pt: "Carro" }
+];
+let memoryCards = [], flippedCards = [], matchedPairs = 0;
+
+function initMemoryGame() {
+    const grid = document.getElementById('memoryGrid');
+    grid.innerHTML = '';
+    document.getElementById('memoryFeedback').textContent = '';
+    matchedPairs = 0; flippedCards = []; memoryCards = [];
+    
+    vocabPairs.forEach(pair => {
+        memoryCards.push({ text: pair.en, id: pair.en, type: 'en' });
+        memoryCards.push({ text: pair.pt, id: pair.en, type: 'pt' });
+    });
+    memoryCards.sort(() => Math.random() - 0.5); // Embaralha as cartas
+
+    memoryCards.forEach((card) => {
+        const cardEl = document.createElement('div');
+        cardEl.classList.add('card');
+        cardEl.textContent = card.text;
+        cardEl.onclick = () => flipCard(cardEl, card);
+        grid.appendChild(cardEl);
+    });
+}
+
+function flipCard(cardEl, card) {
+    if (flippedCards.length < 2 && !cardEl.classList.contains('flipped') 
+        && !cardEl.classList.contains('matched')) {
+        
+        cardEl.classList.add('flipped');
+        flippedCards.push({ el: cardEl, data: card });
+        
+        if (flippedCards.length === 2) setTimeout(checkMatch, 800);
+    }
+}
+
+function checkMatch() {
+    const [card1, card2] = flippedCards;
+    if (card1.data.id === card2.data.id && card1.data.type !== card2.data.type) {
+        card1.el.classList.add('matched'); 
+        card2.el.classList.add('matched');
+        matchedPairs++;
+        
+        if (matchedPairs === vocabPairs.length) {
+            const fb = document.getElementById('memoryFeedback');
+            fb.textContent = "Excellent! You matched all words! 🎉";
+            fb.className = "feedback success";
+        }
+    } else {
+        card1.el.classList.remove('flipped'); 
+        card2.el.classList.remove('flipped');
+    }
+    flippedCards = [];
+}
+
+window.onload = initMemoryGame;
     </script>
 </body>
 </html>
